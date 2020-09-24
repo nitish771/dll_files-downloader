@@ -1,44 +1,38 @@
-## get link -> send it to idm -> downoad -> send to movie folder -> done
-import sys,webbrowser,re
+import sys
+import webbrowser
+import re
 from bs4 import BeautifulSoup
 from urllib.request import urlopen
-from urllib.error import HTTPError
-from urllib.error import URLError
+from urllib.error import HTTPError, URLError
+import details
 
-if len(sys.argv)>1:
-	missing_dll = ' '.join(sys.argv[1:])
+if __name__ == '__main__':
 
-else:
-	missing_dll =  input("What dll file to download\n") 
+    missing_dll = 'd3dx9'
 
-try:
-	html = urlopen(f"https://dll-files.com/{missing_dll}.dll.html")
-	bs = BeautifulSoup(html.read(),'lxml')
+    if len(sys.argv) > 1:
+        missing_dll = ' '.join(sys.argv[1:])
 
-except HTTPError:
-	print("file not found")
+    elif missing_dll == '':
+        missing_dll = input("What dll file to download\n").replace('.dll', '')
+        # print(missing_dll)
 
-except URLError as a:
-	print("url error")
-	
-else:
-	bit_version = bs.findAll('span',{'class':'bit'})
-	links =  bs.findAll('td',{'class','url'})
+    try:
+        html = urlopen(f"https://www.dll-files.com/{missing_dll}.dll.html")
+        bs = BeautifulSoup(html, 'lxml')
+        details.detail(bs)
+        link = bs.find_all('div', {'class': 'download-link'})
+        link = 'https://dll-files.com/' + link[0].a['href']
+        webbrowser.open(link)
 
-print(len(links))
-download_link_pattern = re.compile(r'/download.+')
+        ## Download
 
-index = i = 0
+        # file = requests.get(link, allow_redirects=True)
+        # open('/home/wannacry/Documents/' + missing_dll +
+        #      '.zip', 'wb').write(file.content)
 
-for bit in  bit_version:
-	
-	if '64' in bit:
-		index = i
-	else:
-		i += 1
-print(index)
-# for link in links:
-	
-# 	links_list = download_link_pattern.findall(str(link))
+    except HTTPError:
+        print("file not found")
 
-# webbrowser.open('https://www.dll-files.com'+links_list[index])
+    except URLError as a:
+        print("url error")

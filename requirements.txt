@@ -1,0 +1,2 @@
+webbrowser
+BeautifulSoup4
